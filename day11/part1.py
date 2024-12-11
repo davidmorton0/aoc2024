@@ -1,28 +1,32 @@
 #!/usr/bin/env python
 from collections import defaultdict
 
-with open('input.txt', 'r') as file:
+with open('example.txt', 'r') as file:
     stones = defaultdict(lambda: 0)
-    for stone in [int(stone) for stone in file.read().split("\n")[0].split(' ')]:
+    for stone in [int(stone) for stone in file.read().split(' ')]:
         stones[stone] += 1
 
 def blink(stones):
     new_stones = defaultdict(lambda: 0)
-    for stone, number in stones.items():
+    for stone, count in stones.items():
         if stone == 0:
-            new_stones[1] += number
-        elif len(str(stone)) % 2 == 0:
-            str_stone = str(stone)
-            mid_position = int(len(str_stone) / 2)
-            new_stones[(int(str_stone[0:mid_position]))] += number
-            new_stones[(int(str_stone[mid_position:]))] += number
+            new_stones[1] += count
+        elif has_even_number_of_digits(stone):
+            for new_stone in split_digits(stone):
+                new_stones[new_stone] += count
         else:
-            new_stones[(int(stone * 2024))] += number
+            new_stones[stone * 2024] += count
     return new_stones
 
-print(blink(stones))
+def has_even_number_of_digits(stone):
+    return len(str(stone)) % 2 == 0
 
-for n in range(75):
+def split_digits(stone):
+    stone_string = str(stone)
+    mid_position = int(len(stone_string) / 2)
+    return [(int(stone_string[0:mid_position])), (int(stone_string[mid_position:]))]
+
+for _ in range(75):
     stones = blink(stones)
 
 print(sum(stones.values()))
