@@ -33,26 +33,30 @@ def explore_region(region, position, region_type):
             fencing += 1
     return fencing
 
+def check_corners_direction(check_plots, region, region_type):
+    corners = 0
+    can_check = True
+    print(check_plots)
+    for check_plot in check_plots:
+        can_check = can_check and in_plots(*check_plot)
+
+    if not can_check:
+        print("Skip")
+    # print([region_type, plots[y + 1][x + 1], plots[y + 1][x], plots[y][x + 1]])
+    elif plots[y + 1][x + 1] != region_type and (plots[y + 1][x] == region_type and plots[y][x + 1] == region_type) or (
+            plots[y + 1][x] != region_type and plots[y][x + 1] != region_type):
+        print(True)
+        corners += 1
+    else:
+        print(False)
+    return corners
+
+
 def count_corners(region, region_type):
     corners = 0
     for x, y in region:
         # bottom right corner
-        check_plots = [[x + 1, y + 1], [x, y + 1], [x + 1, y]]
-        can_check = True
-        print([x,y])
-        print(check_plots)
-        for check_plot in check_plots:
-            can_check = can_check and in_plots(*check_plot)
-
-        if not can_check:
-            print("Skip")
-            continue
-        print([region_type, plots[y + 1][x + 1], plots[y + 1][x], plots[y][x + 1]])
-        if plots[y + 1][x + 1] != region_type and (plots[y + 1][x] == region_type and plots[y][x + 1] == region_type) or (plots[y + 1][x] != region_type and plots[y][x + 1] != region_type):
-            print(True)
-            corners += 1
-        else:
-            print(False)
+        check_corners_direction([[x + 1, y + 1], [x, y + 1], [x + 1, y], region, region_type])
     print(region_type)
     print(corners)
 
