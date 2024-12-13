@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from collections import defaultdict
 
-with open('example.txt', 'r') as file:
+with open('input.txt', 'r') as file:
     plots = [list(line) for line in file.read().split("\n") if line != '']
 width = len(plots[0])
 height = len(plots)
@@ -33,51 +33,43 @@ def explore_region(region, position, region_type):
             fencing += 1
     return fencing
 
-def check_corners_direction(check_plots, region, region_type):
-    corners = 0
-    can_check = True
-    print(check_plots)
-    for check_plot in check_plots:
-        can_check = can_check and in_plots(*check_plot)
+def check_corner(corner, region):
+    if corner[0] not in region and corner[1] in region and corner[2] in region:
+        return True
+    elif corner[1] not in region and corner[2] not in region:
+        return True
+    return False
 
-    if not can_check:
-        print("Skip")
-    # print([region_type, plots[y + 1][x + 1], plots[y + 1][x], plots[y][x + 1]])
-    elif plots[y + 1][x + 1] != region_type and (plots[y + 1][x] == region_type and plots[y][x + 1] == region_type) or (
-            plots[y + 1][x] != region_type and plots[y][x + 1] != region_type):
-        print(True)
-        corners += 1
-    else:
-        print(False)
-    return corners
-
-
-def count_corners(region, region_type):
-    corners = 0
+def count_corners(region):
+    corner_count = 0
     for x, y in region:
-        # bottom right corner
-        check_corners_direction([[x + 1, y + 1], [x, y + 1], [x + 1, y], region, region_type])
-    print(region_type)
-    print(corners)
-
-print(plots)
+        corners = [
+            [[x + 1, y + 1], [x, y + 1], [x + 1, y]],
+            [[x + 1, y - 1], [x + 1, y], [x, y - 1]],
+            [[x - 1, y - 1], [x - 1, y], [x, y - 1]],
+            [[x - 1, y + 1], [x - 1, y], [x, y + 1]],
+        ]
+        for corner in corners:
+            if check_corner(corner, region):
+                corner_count += 1
+    return corner_count
 
 next_region = find_next_region()
 fencing_cost = 0
+bulk_fencing_cost = 0
 
-# while next_region:
-fencing = 0
-region = next_region
-region_type = plots[region[0][1]][region[0][0]]
-plots[region[0][1]][region[0][0]] = f"{region_type}*"
-position = 0
-while position < len(region):
-    fencing += explore_region(region, position, region_type)
-    position += 1
-fencing_cost += fencing * len(region)
-print(plots)
-
-count_corners(region, f"{region_type}*")
-next_region = find_next_region()
+while next_region:
+    fencing = 0
+    region = next_region
+    region_type = plots[region[0][1]][region[0][0]]
+    plots[region[0][1]][region[0][0]] = f"{region_type}*"
+    position = 0
+    while position < len(region):
+        fencing += explore_region(region, position, region_type)
+        position += 1
+    fencing_cost += fencing * len(region)
+    bulk_fencing_cost += count_corners(region) * len(region)
+    next_region = find_next_region()
 
 print(fencing_cost)
+print(bulk_fencing_cost)
