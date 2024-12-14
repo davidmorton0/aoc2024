@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from collections import defaultdict
 
 with open('input.txt', 'r') as file:
     plots = [list(line) for line in file.read().split("\n") if line != '']
