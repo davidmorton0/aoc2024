@@ -1,127 +1,99 @@
 #!/usr/bin/env python
-import re
-from itertools import batched
+from itertools import chain
 
-filename = 'input.txt'
+FILENAME = 'input.txt'
+PART = 1
 
-with open(filename, 'r') as file:
-    input = [line for line in file.read().split("\n")]
+if PART == 1:
+    BOX_GPS_SYMBOL = 'O'
+    BOX_SYMBOLS = ['O']
+    CONVERT_MAP_CHARS = {
+        '.': '.',
+        'O': 'O',
+        '#': '#',
+        '@': '@'
+    }
+elif PART == 2:
+    BOX_GPS_SYMBOL = '['
+    BOX_SYMBOLS = ['[', ']']
+    CONVERT_MAP_CHARS = {
+        '.': '..',
+        'O': '[]',
+        '#': '##',
+        '@': '@.'
+    }
 
-robot_position = []
-map = []
-moves = []
+MOVE_CHANGES = {
+    '<': [- 1, 0],
+    '>': [1, 0],
+    '^': [0, - 1],
+    'v': [0, 1]
+}
 
 def print_map():
     for line in map:
         print(''.join(line))
 
-def move_change(move):
-    match move:
-        case '<':
-            return [- 1, 0]
-        case '>':
-            return [1, 0]
-        case '^':
-            return [0, - 1]
-        case 'v':
-            return [0, 1]
+def generate_move(x1, y1, x2, y2, x_adjust):
+    return {
+        "current": [x1 + x_adjust, y1],
+        "new": [x2 + x_adjust, y2],
+        "current_symbol": map[y1][x1 + x_adjust],
+        "new_symbol": map[y2][x2 + x_adjust]
+    }
 
 def propose_moves(x, y, move):
     current_symbol = map[y][x]
-    change = move_change(move)
-    new_x = x + change[0]
-    new_y = y + change[1]
+    new_x = x + MOVE_CHANGES[move][0]
+    new_y = y + MOVE_CHANGES[move][1]
+    new_moves = [generate_move(x, y, new_x, new_y, 0)]
     if current_symbol == '[' and move in ['^', 'v']:
-        return [
-            {
-                "current": [x, y],
-                "new": [new_x, new_y],
-                "current_symbol": map[y][x],
-                "new_symbol": map[new_y][new_x]
-            },
-            {
-                "current": [x + 1, y],
-                "new": [new_x + 1, new_y],
-                "current_symbol": map[y][x + 1],
-                "new_symbol": map[new_y][new_x + 1]
-            }
-        ]
+        new_moves.append(generate_move(x, y, new_x, new_y, 1))
     elif current_symbol == ']' and move in ['^', 'v']:
-        return [
-            {
-                "current": [x, y],
-                "new": [new_x, new_y],
-                "current_symbol": map[y][x],
-                "new_symbol": map[new_y][new_x]
-            },
-            {
-                "current": [x - 1, y],
-                "new": [new_x - 1, new_y],
-                "current_symbol": map[y][x - 1],
-                "new_symbol": map[new_y][new_x - 1]
-            }
-        ]
-    else:
-        return [{
-            "current": [x, y],
-            "new": [new_x, new_y],
-            "current_symbol": map[y][x],
-            "new_symbol": map[new_y][new_x]
-        }]
+        new_moves.append(generate_move(x, y, new_x, new_y, -1))
+    return new_moves
 
 def do_moves(moves):
     for move in moves[::-1]:
         map[move["current"][1]][move["current"][0]] = '.'
         x, y = move["new"]
         map[y][x] = move["current_symbol"]
-    return moves[0]["new"]
 
 def calculate_moves(move, robot_position):
     proposed_moves = propose_moves(*robot_position, move)
 
     for proposed_move in proposed_moves:
-        if proposed_move["new_symbol"] in ['[', ']']:
+        if proposed_move["new_symbol"] in BOX_SYMBOLS:
             proposed_moves.extend(propose_moves(*proposed_move["new"], move))
-
-    new_symbols = [proposed_move["new_symbol"] for proposed_move in proposed_moves]
-    if '#' in new_symbols:
-        return robot_position
-    else:
-        return do_moves(proposed_moves)
+        elif proposed_move["new_symbol"] == '#':
+            return robot_position
+    do_moves(proposed_moves)
+    return proposed_moves[0]["new"]
 
 def count_coordinates(map):
     total = 0
     for y, row in enumerate(map):
         for x, pos in enumerate(list(row)):
-            if pos == '[':
+            if pos == BOX_GPS_SYMBOL:
                 total += 100 * y + x
     return total
 
-get_map = True
+def load_map():
+    with open(FILENAME, 'r') as file:
+        map_lines, moves_lines = file.read().split("\n\n")
+    map = []
+    for line in map_lines.split("\n"):
+        map.append(list(''.join([CONVERT_MAP_CHARS[c] for c in list(line)])))
+    moves = list(chain(*[list(line) for line in moves_lines.split("\n")]))
 
-chars = {
-    '.': '..',
-    'O': '[]',
-    '#': '##',
-    '@': '@.'
-}
+    for y, line in enumerate(map):
+        if '@' in line:
+            robot_position = [line.index('@'), y]
+    return [map, moves, robot_position]
 
-for y, line in enumerate(input):
-    if line == '':
-        get_map = False
-    if get_map:
-        new_line = ''.join([chars[c] for c in list(line)])
-        map.append(list(new_line))
-    else:
-        moves.extend(list(line))
-
-for y, line in enumerate(map):
-    if '@' in line:
-        robot_position = [line.index('@'), y]
-
+map, moves, robot_position = load_map()
 
 for move in moves:
     robot_position = calculate_moves(move, robot_position)
 
-print_map()
 print(count_coordinates(map))
