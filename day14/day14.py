@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import re
-from itertools import batched
 
 example = False
 if example:

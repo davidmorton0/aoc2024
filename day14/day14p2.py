@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import re
 import time
-from itertools import batched
 
 example = False
 if example:
@@ -37,13 +36,13 @@ def find_quadrant(x, y):
     return quadrant
 
 quadrant_count = [0,0,0,0,0]
-
+# 114
 
 frames = width * height
-start_n = 27
+start_n = 13
 s = 27
 t = 103
-for n in range(start_n, start_n + frames, 103):
+for n in range(start_n, start_n + frames, 101):
     line = [' '] * width
     grid = []
     for _ in range(0, height):
