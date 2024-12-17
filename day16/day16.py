@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-FILENAME = 'example_1.txt'
+FILENAME = 'input.txt'
+best_score = 776584
 
 with open(FILENAME, 'r') as file:
     maze = [list(line) for line in file.read().split("\n") if line != ""]
@@ -21,34 +22,14 @@ def find_exits(x1, y1):
 
 paths = [[[*START]]]
 
-# new_paths = []
-# complete_paths = []
-# while (len(paths) > 0):
-#     for n, path in enumerate(paths):
-#         exits = find_exits(*path[-1])
-#         for x, y in exits:
-#             if maze[y][x] == 'E':
-#                 complete_paths.append([*path, [x, y]])
-#             elif maze[y][x] == '.' and [x, y] not in path:
-#                 new_paths.append([*path, [x, y]])
-#     print(f"Paths: {len(new_paths)}")
-#     print(f"Complete paths: {len(complete_paths)}")
-#     paths = new_paths
-#     new_paths = []
-
 def find_next_path(path):
     while len(path) > 1:
         previous_location = path.pop()
         current_location = path[-1]
         x, y = current_location
         valid_exits = [exit for exit in find_exits(x, y) if exit not in path]
-        # print(previous_location)
-        # print(current_location)
-        # print(valid_exits)
-        # print()
         if valid_exits and valid_exits[-1] != previous_location:
             new_path = path + [valid_exits[valid_exits.index(previous_location) + 1]]
-            # print(new_path)
             return extend_path(new_path)
     return False, False
 
@@ -57,11 +38,10 @@ def extend_path(path):
     while maze[y][x] != 'E':
         exits = find_exits(x, y)
         valid_exits = [exit for exit in exits if exit not in path]
-        if len(valid_exits) == 0:
+        if len(valid_exits) == 0 or score_path(path) > best_score:
             return path, False
         path.append(valid_exits[0])
         x, y = path[-1]
-    # print("Path found")
     return path, True
 
 def score_path(path):
@@ -90,26 +70,48 @@ def find_next_valid_path(path):
     return False
 
 current_path, success = extend_path([START])
+# if success:
+#     best_score = score_path(current_path)
+#     best_path = current_path
+# else:
+#     best_score = 100000000000
+
+print(current_path)
+print(success)
 if success:
-    best_score = score_path(current_path)
-    best_path = current_path
-else:
-    best_score = 100000000000
+    score = score_path(current_path)
+    if best_score > score:
+        best_score = score
 
-valid_path = True
-while valid_path:
-    valid_path = find_next_valid_path(current_path)
-    print(valid_path)
-    if valid_path:
-        valid_path_score = score_path(valid_path)
-        if best_score > valid_path_score:
-            best_score = valid_path_score
-            best_path = valid_path
-            print(best_path)
-            print(best_score)
+current_path = find_next_valid_path(current_path)
+valid_paths = 2
 
-print(best_path)
+while(current_path):
+    score = score_path(current_path)
+    print(score)
+    if best_score > score:
+        best_score = score
+    current_path = find_next_valid_path(current_path)
+    valid_paths += 1
+    print(best_score)
+    print(valid_paths)
+print()
 print(best_score)
+
+# valid_path = True
+# while valid_path:
+#     valid_path = find_next_valid_path(current_path)
+#     print(valid_path)
+#     if valid_path:
+#         valid_path_score = score_path(valid_path)
+#         if best_score > valid_path_score:
+#             best_score = valid_path_score
+#             best_path = valid_path
+#             print(best_path)
+#             print(best_score)
+#
+# print(best_path)
+# print(best_score)
 
 
 # while p1:
