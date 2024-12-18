@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-FILENAME = 'input.txt'
+FILENAME = 'input_w.txt'
 SIZE = 71
 BYTES_FALLEN = 1024
 
