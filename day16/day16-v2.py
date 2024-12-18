@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from path import Path
 
-FILENAME = 'input_h.txt'
+FILENAME = 'input_w.txt'
 
 with open(FILENAME, 'r') as file:
     maze = [list(line) for line in file.read().split("\n") if line != ""]

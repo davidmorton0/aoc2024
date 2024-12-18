@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-FILENAME = 'input.txt'
+FILENAME = 'input_w.txt'
 best_score = 776584
 
 with open(FILENAME, 'r') as file:
