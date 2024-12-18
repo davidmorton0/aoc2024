@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-INPUT = 1
-FILENAME = ['example.txt', 'input_w.txt'][INPUT]
-SIZE = [7, 71][INPUT]
-BYTES_FALLEN = [12, 1024][INPUT]
+INPUT = 2
+FILENAME = ['example.txt', 'input_w.txt', 'input_h.txt'][INPUT]
+SIZE = [7, 71, 71][INPUT]
+BYTES_FALLEN = [12, 1024, 1024][INPUT]
 MAX_ITERATIONS = 10000
 
 space = [['.' for col in range(SIZE)] for row in range(SIZE)]
@@ -50,7 +50,7 @@ def find_path():
             return True
     return False
 
-for n in range(0, len(bytes)):
+for n in range(2900, len(bytes)):
     space = generate_space(space)
     add_bytes(n)
     if not find_path():

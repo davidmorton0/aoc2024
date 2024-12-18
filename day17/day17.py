@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-FILENAME = 'input_w.txt'
+FILENAME = 'input_h.txt'
 
 with open(FILENAME, 'r') as file:
     input = [line for line in file.read().split("\n")]
@@ -222,3 +222,42 @@ REGISTERS = {
 }
 print(program)
 print(",".join([str(c) for c in run_program(program)]))
+
+output = []
+REGISTERS = {
+    "A": 37283687,
+    "B": 0,
+    "C": 0
+}
+program = [2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0]
+print(program)
+print(",".join([str(c) for c in run_program(program)]))
+
+output = []
+REGISTERS = {
+    "A": 117440,
+    "B": 0,
+    "C": 0
+}
+program = [0,3,5,4,3,0]
+print(program)
+print(",".join([str(c) for c in run_program(program)]))
+
+
+program = [0,3,5,4,3,0]
+check_number = 0
+output = []
+REGISTERS = {
+    "A": check_number,
+    "B": 0,
+    "C": 0
+}
+while run_program(program) != program:
+    output = []
+    check_number += 1
+    print(check_number)
+    REGISTERS = {
+        "A": check_number,
+        "B": 0,
+        "C": 0
+    }
