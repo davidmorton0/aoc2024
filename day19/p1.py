@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-INPUT = 1
+INPUT = 2
 FILENAME = ['example.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 
 with open(FILENAME, 'r') as file:

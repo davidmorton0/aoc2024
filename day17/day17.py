@@ -244,20 +244,12 @@ print(program)
 print(",".join([str(c) for c in run_program(program)]))
 
 
-program = [0,3,5,4,3,0]
-check_number = 0
+program = [2,4,1,1,7,5,4,6,1,4,0,3,5,5,3,0]
 output = []
 REGISTERS = {
-    "A": check_number,
+    "A": 59397658,
     "B": 0,
     "C": 0
 }
-while run_program(program) != program:
-    output = []
-    check_number += 1
-    print(check_number)
-    REGISTERS = {
-        "A": check_number,
-        "B": 0,
-        "C": 0
-    }
+print(program)
+print(",".join([str(c) for c in run_program(program)]))
