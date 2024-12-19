@@ -32,7 +32,6 @@ def operand(value):
             return REGISTERS["C"]
 
 def process_instruction(instruction, op, pointer=0):
-    # print([instruction, op, REGISTERS])
     match instruction:
         case 0:
             return adv(op, pointer)
@@ -55,7 +54,6 @@ def run_program(program):
     pointer = 0
     while pointer < len(program):
         instruction, op = program[pointer:pointer + 2]
-        # print([pointer, [instruction, op]])
         pointer = process_instruction(instruction, op, pointer)
     return output
 
@@ -96,81 +94,23 @@ def cdv(op, pointer=0):
     REGISTERS["C"] = value
     return pointer + 2
 
-# program = [0,3,5,4,3,0]
-# check_number = 0
-# output = []
-# REGISTERS = {
-#     "A": check_number,
-#     "B": 0,
-#     "C": 0
-# }
-# while run_program(program) != program:
-#     output = []
-#     check_number += 1
-#     print(check_number)
-#     REGISTERS = {
-#         "A": check_number,
-#         "B": 0,
-#         "C": 0
-#     }
-
-def process(a):
-    return (((a % 8) ^ 3) ^ int(a / (2 ** ((a % 8) ^ 3))) ^ 3) % 8
-
-RESULTS = []
 program = [2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0]
+best = 1
+start_range = best
+end_range = best * 8 + 1000
+RESULTS = []
 
-# best = 13513445758112
-# start_range = 0
-# end_range = 16
-# check_numbers = list(range(start_range, end_range))
-# print([start_range, end_range])
-# for check_number in check_numbers:
-#     output = []
-#     REGISTERS = {
-#         "A": check_number,
-#         "B": 0,
-#         "C": 0
-#     }
-#     RESULTS.append([check_number, run_program(program), process(check_number)])
-#
-# print(RESULTS)
-results = []
-# for check_number in range(0, 1000):
-digits = [1, 1 , 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1,1]
-print(len(digits))
-print(len(program))
-number = 0
-check_number = sum([d * 8 ** n for n, d in enumerate(digits[::-1])])
-print(check_number)
-REGISTERS = {
+for check_number in range(start_range, end_range):
+    output = []
+    REGISTERS = {
         "A": check_number,
         "B": 0,
         "C": 0
     }
-output = []
-run_program(program)
-print(output)
-# results.append([bin(check_number), check_number, output])
-# print([r for r in results if r[2][0] == 2])
+    run_program(program)
+    RESULTS.append([check_number, output])
 
-# digits = 15
-# check_res = program[-digits:]
-# correct_results = [result for result in RESULTS if result[1] == check_res]
-# print([2,4,1,3,7,5,4,1,1,3,0,3,5,5,3,0][-digits:])
-# print(correct_results)
-
-'''                                                                             a = 00001
-1. 2,4 - reg b = reg A mod 8            b = a % 8                               b = 00001
-2. 1,3 - reg b = reg b ^ 3              b = (a % 8) ^ 3                         b = 00010
-3. 7,5 - reg c = reg a / 2 ** reg b     c = int(a / (2 ** ((a % 8) ^ 3)))       c = 00000
-4. 4,1 - reg b = reg b ^ reg c          b= ((a % 8) ^ 3) ^  c                   b = 00010
-5. 1,3 - reg b = reg b ^ 3              b = (((a % 8) ^ 3) ^  c) ^ 3            b = 00001
-6. 0,3 - reg a = reg a / 8              a = a / 8
-7. 5,5 - output reg b % 8               output ((((a % 8) ^ 3) ^  int(a / (2 ** ((a % 8) ^ 3)))) ^ 3) % 8
-8. 3,0 - jump to 0 if reg a not 0
-program loops 16 times
-
-
-'''
-
+digits = 3
+correct_results = [result for result in RESULTS if result[1] == program[-digits:]]
+print(program[-digits:])
+print(correct_results)
