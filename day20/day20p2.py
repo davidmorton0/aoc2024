@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from collections import defaultdict
 
-INPUT = 2
+INPUT = 1
 FILENAME = ['example.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 
 with open(FILENAME, 'r') as file:
