@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 from itertools import pairwise
+from math import inf
 
 INPUT = 1
+PADS = 25
 FILENAME = ['example.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 
 with open(FILENAME, 'r') as file:
@@ -22,73 +24,114 @@ MAIN_PAD_COORDINATES = {
     '9': [2, 3],
 }
 
-DIR_PAD_COORDINATES = {
-    '<': [0, 0],
-    'v': [1, 0],
-    '>': [2, 0],
-    'EMPTY': [0, 1],
-    '^': [1, 1],
-    'A': [2, 1],
+DIR_PAD_ROUTES = {
+    '<': {
+        '<': ['A'],
+        'v': ['>', 'A'],
+        '>': ['>', '>', 'A'],
+        '^': ['>', '^', 'A'],
+        'A': ['>', '>', '^','A'],
+    },
+    'v': {
+        '<': ['<', 'A'],
+        'v': ['A'],
+        '>': ['>', 'A'],
+        '^': ['^', 'A'],
+        'A': [ '^', '>','A'],
+    },
+    '>': {
+        '<': ['<', '<', 'A'],
+        'v': ['<', 'A'],
+        '>': ['A'],
+        '^': ['<', '^', 'A'],
+        'A': ['^', 'A'],
+    },
+    '^': {
+        '<': ['v', '<', 'A'],
+        'v': ['v', 'A'],
+        '>': [ 'v','>', 'A'],
+        '^': ['A'],
+        'A': ['>', 'A'],
+    },
+    'A': {
+        '<': ['v', '<', '<', 'A'],
+        'v': ['<', 'v', 'A'],
+        '>': ['v', 'A'],
+        '^': ['<', 'A'],
+        'A': ['A'],
+    }
 }
+def calculate_sequence_presses(sequence):
+    moves_list = [[]]
+    start_x, start_y = MAIN_PAD_COORDINATES['A']
+    for button in sequence:
+        x, y = MAIN_PAD_COORDINATES[button]
+        x_diff = x - start_x
+        x_moves = ['>'] * x_diff + ['<'] * -x_diff
+        y_diff = y - start_y
+        y_moves = ['^'] * y_diff + ['v'] * -y_diff
+        possible_moves = []
+        if not(start_y == 0 and x == 0) and y_diff != 0:
+            possible_moves.append(x_moves + y_moves + ['A'])
+        if not(start_x == 0 and y == 0) and x_diff != 0:
+            possible_moves.append(y_moves + x_moves + ['A'])
+        start_x, start_y = x, y
 
-
-def calculate_presses(current_button, next_button, button_coordinates):
-    button_presses = []
-    x_dist = button_coordinates[next_button][0] - button_coordinates[current_button][0]
-    y_dist = button_coordinates[next_button][1] - button_coordinates[current_button][1]
-    if x_dist < 0:
-        x_presses = ['<'] * abs(x_dist)
-    elif x_dist > 0:
-        x_presses = ['>'] * abs(x_dist)
-    else:
-        x_presses = []
-    if y_dist < 0:
-        y_presses = ['v'] * abs(y_dist)
-    elif y_dist > 0:
-        y_presses = ['^'] * abs(y_dist)
-    else:
-        y_presses = []
-    if x_presses and not [button_coordinates[next_button][0], button_coordinates[current_button][1]] == button_coordinates['EMPTY']:
-        button_presses.append([*x_presses, *y_presses, 'A'])
-    if y_presses and not [button_coordinates[current_button][0], button_coordinates[next_button][1]] == button_coordinates['EMPTY']:
-        button_presses.append([*y_presses, *x_presses, 'A'])
-    if not (x_presses or y_presses):
-        button_presses = [['A']]
-    return button_presses
-
-
-def calculate_sequence_presses(sequence, pad):
-    if pad == 'main':
-        coordinates = MAIN_PAD_COORDINATES
-    else:
-        coordinates = DIR_PAD_COORDINATES
-    current_button_sequences = calculate_presses('A', sequence[0], coordinates)
-
-    for a, b in pairwise(sequence):
-        new_current_button_presses = []
-        for current_button_sequence in current_button_sequences:
-            for new_button_presses in calculate_presses(a, b, coordinates):
-                new_current_button_presses.append(current_button_sequence + new_button_presses)
-        current_button_sequences = new_current_button_presses
-    return current_button_sequences
+        m = []
+        for moves in moves_list:
+            for p in possible_moves:
+                m.append(moves + p)
+        moves_list = m
+    return moves_list
 
 def find_numeric_part(sequence):
-    return int(''.join([c for c in list(sequence) if c != 'A']))
+    return int(''.join(sequence[:-1]))
 
+def generate_button_press_counts(press_counts):
+    for n in range(PADS - 1):
+        press_count = {}
+        for k1, v1 in DIR_PAD_ROUTES.items():
+            press_count[k1] = {}
+            for k2, v2 in v1.items():
+                p = ['A', *v2]
+                total = 0
+                for s, e in pairwise(p):
+                    total += press_counts[n][s][e]
+                press_count[k1][k2] = total
+        press_counts.append(press_count)
+
+press_count = {}
+for k1, v1 in DIR_PAD_ROUTES.items():
+    press_count[k1] = {}
+    for k2, v2 in v1.items():
+        press_count[k1][k2] = len(v2)
+
+press_counts = [press_count]
+generate_button_press_counts(press_counts)
+
+total2 = 0
 total = 0
 for sequence in sequences:
-    print(sequence)
-    presses1 = calculate_sequence_presses(sequence, 'main')
-    print(presses1)
-    presses2 = []
-    for presses in presses1:
-        presses2.extend(calculate_sequence_presses(presses, 'dir'))
-    presses3 = []
-    for presses in presses2:
-        presses3.extend(calculate_sequence_presses(presses, 'dir'))
-    l = min([len(ps) for ps in presses3])
-    c = find_numeric_part(sequence)
-    print(l)
-    print(max([len(ps) for ps in presses3]))
-    total += (c * l)
+    sequence_total2 = inf
+    sequence_total = inf
+    for presses in calculate_sequence_presses(sequence):
+        presses_needed2 = []
+        presses_needed = []
+        current = 'A'
+        for press in presses:
+            presses_needed2.append(press_counts[1][current][press])
+            presses_needed.append(press_counts[PADS - 1][current][press])
+            current = press
+        if sum(presses_needed) < sequence_total:
+            sequence_total = sum(presses_needed)
+        if sum(presses_needed2) < sequence_total2:
+            sequence_total2 = sum(presses_needed2)
+
+    # print(sequence)
+    # print(sequence_total)
+    numeric = find_numeric_part(sequence)
+    total2 += sequence_total2 * numeric
+    total += sequence_total * numeric
+
+print(total2)
 print(total)
