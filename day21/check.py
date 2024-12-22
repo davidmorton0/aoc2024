@@ -29,7 +29,7 @@ def day21(s, *, part2=True):
     # directional keypad given that the previous direction code (from the prior directional keypad
     # n_dir - 1, if n_dir > 0) was `last_dir_ch`.
     @functools.cache
-    def dir_cost(y, x, y2, x2, n_dir=3 if part2 else 2, last_dir_ch='A'):
+    def dir_cost(y, x, y2, x2, n_dir=25 if part2 else 2, last_dir_ch='A'):
         if n_dir == 0:
             return 1  # On the zero'th directional keypad, all codes cost exactly 1.
         if (y, x) == (y2, x2):

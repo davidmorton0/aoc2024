@@ -2,7 +2,7 @@
 from itertools import pairwise
 
 INPUT = 2
-PADS = 3
+PADS = 25
 FILENAME = ['example.txt', 'example_2.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 
 with open(FILENAME, 'r') as file:
@@ -38,14 +38,14 @@ DIR_PAD_ROUTES = {
         'v': ['>', 'A'],
         '>': ['>', '>', 'A'],
         '^': ['>', '^', 'A'],
-        'A': ['^','>', '>',  'A'],
+        'A': ['>', '>', '^','A'],
     },
     'v': {
         '<': ['<', 'A'],
         'v': ['A'],
         '>': ['>', 'A'],
         '^': ['^', 'A'],
-        'A': ['>', '^', 'A'],
+        'A': [ '^', '>','A'],
     },
     '>': {
         '<': ['<', '<', 'A'],
@@ -55,14 +55,14 @@ DIR_PAD_ROUTES = {
         'A': ['^', 'A'],
     },
     '^': {
-        '<': ['<', 'v', 'A'],
+        '<': ['v', '<', 'A'],
         'v': ['v', 'A'],
-        '>': ['>', 'v', 'A'],
+        '>': [ 'v','>', 'A'],
         '^': ['A'],
         'A': ['>', 'A'],
     },
     'A': {
-        '<': ['<', '<', 'v', 'A'],
+        '<': ['v', '<', '<', 'A'],
         'v': ['<', 'v', 'A'],
         '>': ['v', 'A'],
         '^': ['<', 'A'],
@@ -117,7 +117,7 @@ for k1, v1 in DIR_PAD_ROUTES.items():
         press_count[k1][k2] = len(v2)
 press_counts.append(press_count)
 
-for n in range(2):
+for n in range(25):
     press_count = {}
     for k1, v1 in DIR_PAD_ROUTES.items():
         press_count[k1] = {}
