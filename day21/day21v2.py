@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from itertools import pairwise
 
-INPUT = 2
+INPUT = 3
 PADS = 25
 FILENAME = ['example.txt', 'example_2.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 
