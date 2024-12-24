@@ -5,7 +5,7 @@ from itertools import pairwise
 start_time = time.time()
 
 INPUT = 1
-FILENAME = ['example.txt', 'input_h.txt', 'input_w.txt'][INPUT]
+FILENAME = ['example_1.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 
 with open(FILENAME, 'r') as file:
     reports = []

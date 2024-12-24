@@ -4,7 +4,7 @@ from math import inf
 
 INPUT = 1
 PADS = 25
-FILENAME = ['example.txt', 'input_h.txt', 'input_w.txt'][INPUT]
+FILENAME = ['example_1.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 
 with open(FILENAME, 'r') as file:
     sequences = [list(line) for line in file.read().split("\n") if line != ""]

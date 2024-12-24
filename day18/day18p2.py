@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 INPUT = 2
-FILENAME = ['example.txt', 'input_w.txt', 'input_h.txt'][INPUT]
+FILENAME = ['example_1.txt', 'input_w.txt', 'input_h.txt'][INPUT]
 SIZE = [7, 71, 71][INPUT]
 BYTES_FALLEN = [12, 1024, 1024][INPUT]
 MAX_ITERATIONS = 10000
