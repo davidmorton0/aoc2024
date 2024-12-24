@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 from collections import defaultdict
 from operator import itemgetter
+from itertools import combinations
 import time
 
 start_time = time.time()
 
 INPUT = 2
 FILENAME = ['example_1.txt', 'example_2.txt', 'example_3.txt', 'input_h.txt', 'input_w.txt'][INPUT]
+DIGITS = [3, 5, 6, 45, 45][INPUT]
 
 with open(FILENAME, 'r') as file:
     initial_wire_values_input, connections_input = file.read().split("\n\n")
@@ -54,7 +56,7 @@ def check_values(wire_values):
 def calculate_value(wire_values, letter):
     result_values = get_values(wire_values, letter)
     result_values.sort()
-    print([letter, result_values])
+    # print([letter, result_values])
     return int(''.join([str(result[1]) for result in result_values[::-1]]), 2)
 
 def calculate(wire_values, connections):
@@ -63,9 +65,9 @@ def calculate(wire_values, connections):
         found_result = False
         for connection in connections:
             wire1, wire2, gate_type, result_wire = itemgetter("wire1", "wire2", "gate_type", "result_wire")(connection)
-            wire_value1 = wire_values[wire1]
-            wire_value2 = wire_values[wire2]
-            result_value = wire_values[result_wire]
+            wire_value1 = wire_values.get(wire1)
+            wire_value2 = wire_values.get(wire2)
+            result_value = wire_values.get(result_wire)
             result = None
             if (not wire_value1 is None) and (not wire_value2 is None) and result_value is None:
                 match gate_type:
@@ -80,19 +82,39 @@ def calculate(wire_values, connections):
 def and_calculation(x, y, z):
     return x & y == z
 
+def plus_calculation(x, y, z):
+    return x + y == z
+
+def set_wire_values(x, y):
+    wire_values = {}
+    for n, val in enumerate(list(bin(x)[2:].zfill(DIGITS))[::-1]):
+        wire_values[f"x{str(n).zfill(2)}"] = int(val)
+    for n, val in enumerate(list(bin(y)[2:].zfill(DIGITS))[::-1]):
+        wire_values[f"y{str(n).zfill(2)}"] = int(val)
+    # print(wire_values)
+    return wire_values
+
 def check_calculator(swaps):
-    wire_values = load_initial_values()
-    connections = load_initial_connections()
-    for a, b in swaps:
-        connections[a]["result_wire"], connections[b]["result_wire"] = connections[b]["result_wire"], connections[a]["result_wire"]
-    wire_values_result = calculate(wire_values, connections)
+    for x in range(0, DIGITS - 1):
+        for y in range(0, DIGITS - 1):
+            wire_values = set_wire_values(x, y)
+            connections = load_initial_connections()
+            for a, b in swaps:
+                connections[a]["result_wire"], connections[b]["result_wire"] = connections[b]["result_wire"], connections[a]["result_wire"]
+            wire_values_result = calculate(wire_values, connections)
 
-    x = calculate_value(wire_values_result, 'x')
-    y = calculate_value(wire_values_result, 'y')
-    z = calculate_value(wire_values_result, 'z')
-    print(f"Equation: {x} & {y} = {z}")
-    print(x & y == z)
+            x = calculate_value(wire_values_result, 'x')
+            y = calculate_value(wire_values_result, 'y')
+            z = calculate_value(wire_values_result, 'z')
+            if not and_calculation(x, y, z):
+                print(f"Fail: {swaps} {x} & {y} != {z}")
+                return
 
-    return and_calculation(x, y, z)
+    print(f"Success: {swaps}")
 
-print(check_calculator([[0, 5], [1, 2]]))
+connections = load_initial_connections()
+swaps = 2
+for a,b,c,d in combinations(range(len(connections)), swaps * 2):
+    check_calculator([[a, b], [c, d]])
+    check_calculator([[a, c], [b, d]])
+    check_calculator([[a, d], [b, c]])
