@@ -6,7 +6,7 @@ import time
 
 start_time = time.time()
 
-INPUT = 2
+INPUT = 3
 FILENAME = ['example_1.txt', 'example_2.txt', 'example_3.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 DIGITS = [3, 5, 6, 45, 45][INPUT]
 
@@ -94,9 +94,9 @@ def set_wire_values(x, y):
     # print(wire_values)
     return wire_values
 
-def check_calculator(swaps):
-    for x in range(0, DIGITS - 1):
-        for y in range(0, DIGITS - 1):
+def check_calculator(swaps, x_values, y_values):
+    for x in x_values:
+        for y in y_values:
             wire_values = set_wire_values(x, y)
             connections = load_initial_connections()
             for a, b in swaps:
@@ -106,15 +106,72 @@ def check_calculator(swaps):
             x = calculate_value(wire_values_result, 'x')
             y = calculate_value(wire_values_result, 'y')
             z = calculate_value(wire_values_result, 'z')
-            if not and_calculation(x, y, z):
-                print(f"Fail: {swaps} {x} & {y} != {z}")
-                return
+            if not plus_calculation(x, y, z):
+                # print(f"Fail: {swaps} {x} + {y} != {z}")
+                return False
+            # else:
+            #     print(f"Success: {x} + {y} = {z}")
 
-    print(f"Success: {swaps}")
+    return True
 
-connections = load_initial_connections()
-swaps = 2
-for a,b,c,d in combinations(range(len(connections)), swaps * 2):
-    check_calculator([[a, b], [c, d]])
-    check_calculator([[a, c], [b, d]])
-    check_calculator([[a, d], [b, c]])
+def test(swaps, x_values, y_values, message, should_print):
+    if check_calculator(swaps, x_values, y_values):
+        if should_print:
+            print(f"Success: {message}. Swaps: {swaps}")
+        return True
+    else:
+        if should_print:
+            print(f"Failed: {message}. Swaps: {swaps}")
+        return False
+
+def passing_tests(swaps, printing, skip_x_values, skip_y_values):
+    if not test(swaps, [0], [0], "0 values", printing):
+        return False
+    for x in range(45):
+        if x in skip_x_values:
+            continue
+        if not test(swaps, [2 ** x], [0], f"x bit {x}", printing):
+            return False
+    for y in range(45):
+        if y in skip_y_values:
+            continue
+        if not test(swaps, [0], [2 ** y], f"y bit {y}", printing):
+            return False
+    return True
+
+def count_failing_tests(swaps):
+    count = 0
+    for x in [5, 11, 23, 38]:
+        if not test(swaps, [2 ** x], [0], f"x bit {x}", False):
+            count += 1
+    for y in [5, 11, 23, 38]:
+        if not test(swaps, [0], [2 ** y], f"y bit {y}", False):
+            count += 1
+    for x in [6, 11]:
+        if not test(swaps, [2 ** x - 1], [1], f"x bit {x}", False):
+            count += 1
+    return count
+
+def check_swaps(swap_count):
+    connections = load_initial_connections()
+    for a, b in combinations(range(len(connections)), 2):
+        swaps = [[a, b]]
+        failing_tests_count = count_failing_tests(swaps)
+        if failing_tests_count < swap_count:
+            if passing_tests(swaps, False, [5, 11, 23, 38], [5, 11, 23, 38]):
+                print(f"Swaps: {swaps}. Failing tests: {failing_tests_count}")
+'''
+possible swaps
+[3, 101] [50, 101] [131, 101] [191, 101] [212, 101] +
+[9, 33] [20, 33]
+[24, 109] [32, 109] [109, 179] +
+[32, 139] +
+[41, 74] [108, 74] [177, 74] +
+[120, 212] +
+
+[32, 109], [212, 101], [41, 74]
+'''
+print(passing_tests([], False, [5, 11, 23, 38], [5, 11, 23, 38]))
+swaps = [[32, 109]]
+print(count_failing_tests(swaps))
+check_swaps(6)
