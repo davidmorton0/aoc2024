@@ -6,7 +6,7 @@ import time
 
 start_time = time.time()
 
-INPUT = 3
+INPUT = 4
 FILENAME = ['example_1.txt', 'example_2.txt', 'example_3.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 DIGITS = [3, 5, 6, 45, 45][INPUT]
 
@@ -141,10 +141,10 @@ def passing_tests(swaps, printing, skip_x_values, skip_y_values):
 
 def count_failing_tests(swaps):
     count = 0
-    for x in [38]:
+    for x in [39]:
         if not test(swaps, [2 ** x], [0], f"x bit {x}", True):
             count += 1
-    for y in [38]:
+    for y in [39]:
         if not test(swaps, [0], [2 ** y], f"y bit {y}", True):
             count += 1
     for x in []:
@@ -160,21 +160,17 @@ def check_swaps(swap_count):
         if failing_tests_count < swap_count:
             if passing_tests(swaps, False, [5, 11, 23, 38], [5, 11, 23, 38]):
                 print(f"Swaps: {swaps}. Failing tests: {failing_tests_count}")
-'''
-possible swaps
-[3, 101] [50, 101] [131, 101] [191, 101] [212, 101] +
-[9, 33] [20, 33]
-[24, 109] [32, 109] [109, 179] +
-[32, 139] +
-[41, 74] [108, 74] [177, 74] +
-[120, 212] +
 
-[32, 109], [212, 101], [41, 74]
-'''
-swaps = [[177, 74], [24, 109], [20, 33], [131, 101]]
-print(passing_tests(swaps, False, [38], [38]))
+# swaps_h = [[177, 74], [24, 109], [20, 33], [131, 101]]
+swaps = [[59, 1],[111,7],[2,109],[24,91]]
+print(passing_tests(swaps, False, [39], [39]))
 print(count_failing_tests([]))
 print(count_failing_tests(swaps))
+
+# print(passing_tests(swaps, False, [10, 21, 33, 39], [10, 21, 33, 39]))
+# print(count_failing_tests([]))
+# print(count_failing_tests(swaps))
+
 connections = load_initial_connections()
 names = []
 for a, b in swaps:

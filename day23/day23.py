@@ -10,6 +10,7 @@ INPUT = 2
 FILENAME = ['example_1.txt', 'example_2.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 REGEX = r'(\w{2})-(\w{2})'
 
+
 with open(FILENAME, 'r') as file:
     connection_list = [line for line in file.read().split("\n") if line != ""]
 
