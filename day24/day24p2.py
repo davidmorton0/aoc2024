@@ -141,14 +141,14 @@ def passing_tests(swaps, printing, skip_x_values, skip_y_values):
 
 def count_failing_tests(swaps):
     count = 0
-    for x in [5, 11, 23, 38]:
-        if not test(swaps, [2 ** x], [0], f"x bit {x}", False):
+    for x in [38]:
+        if not test(swaps, [2 ** x], [0], f"x bit {x}", True):
             count += 1
-    for y in [5, 11, 23, 38]:
-        if not test(swaps, [0], [2 ** y], f"y bit {y}", False):
+    for y in [38]:
+        if not test(swaps, [0], [2 ** y], f"y bit {y}", True):
             count += 1
-    for x in [6, 11]:
-        if not test(swaps, [2 ** x - 1], [1], f"x bit {x}", False):
+    for x in []:
+        if not test(swaps, [2 ** x - 1], [1], f"x bit {x}", True):
             count += 1
     return count
 
@@ -171,7 +171,16 @@ possible swaps
 
 [32, 109], [212, 101], [41, 74]
 '''
-print(passing_tests([], False, [5, 11, 23, 38], [5, 11, 23, 38]))
-swaps = [[32, 109]]
+swaps = [[177, 74], [24, 109], [20, 33], [131, 101]]
+print(passing_tests(swaps, False, [38], [38]))
+print(count_failing_tests([]))
 print(count_failing_tests(swaps))
-check_swaps(6)
+connections = load_initial_connections()
+names = []
+for a, b in swaps:
+    names.append(connections[a]['result_wire'])
+    names.append(connections[b]['result_wire'])
+    print(connections[a])
+    print(connections[b])
+names.sort()
+print(','.join(names))
