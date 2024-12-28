@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 INPUT = 2
-FILENAME = ['example_1.txt', 'input.txt', 'input_w.txt'][INPUT]
+FILENAME = ['example_1.txt', 'input_w.txt', 'input_w.txt'][INPUT]
 
 with open(FILENAME, 'r') as file:
     towel_lines, design_lines = file.read().split("\n\n")

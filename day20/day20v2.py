@@ -2,7 +2,7 @@
 from collections import defaultdict
 
 INPUT = 1
-FILENAME = ['example_1.txt', 'input.txt', 'input_w.txt'][INPUT]
+FILENAME = ['example_1.txt', 'input_w.txt', 'input_w.txt'][INPUT]
 MIN_CHEAT_SIZE_1 = [2, 100, 100][INPUT]
 MIN_CHEAT_SIZE_2 = [50, 100, 100][INPUT]
 

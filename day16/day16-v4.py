@@ -2,7 +2,7 @@
 from math import inf
 
 INPUT = 0
-FILENAME = ['example_1.txt', 'example_2.txt', 'input.txt', 'input_w.txt'][INPUT]
+FILENAME = ['example_1.txt', 'example_2.txt', 'input_w.txt', 'input_w.txt'][INPUT]
 DIRECTIONS = ['<','>','^','v']
 
 def create_location(symbol):

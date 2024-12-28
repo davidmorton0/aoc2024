@@ -36,7 +36,7 @@ def solve(filename):
     print(calculate_enabled_instructions_total(input))
     print()
 
-for filename in ['example_1.txt', 'example_2.txt', 'input.txt']:
+for filename in ['example_1.txt', 'example_2.txt', 'input_w.txt']:
     solve(filename)
 
 print("--- %s seconds ---" % (time.time() - start_time))
