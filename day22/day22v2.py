@@ -3,7 +3,7 @@ from itertools import pairwise
 from collections import defaultdict
 
 INPUT = 3
-FILENAME = ['example_1.txt', 'example_2.txt', 'input_h.txt', 'input_w.txt'][INPUT]
+FILENAME = ['example_1.txt', 'example_2.txt', 'input.txt', 'input_w.txt'][INPUT]
 PRUNE_NUMBER = 16777216
 MAX_SECRET_NUMBERS = 2000
 

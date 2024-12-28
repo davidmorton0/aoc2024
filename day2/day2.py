@@ -4,15 +4,14 @@ from itertools import pairwise
 
 start_time = time.time()
 
-INPUT = 1
-FILENAME = ['example_1.txt', 'input_h.txt', 'input_w.txt'][INPUT]
-
-with open(FILENAME, 'r') as file:
-    reports = []
-    for line in file.read().split("\n"):
-        if line == "":
-            continue
-        reports.append([int(levels) for levels in line.split(" ")])
+def load_input(filename):
+    with open(filename, 'r') as file:
+        reports = []
+        for line in file.read().split("\n"):
+            if line == "":
+                continue
+            reports.append([int(levels) for levels in line.split(" ")])
+    return reports
 
 def is_safe(report):
     if report[0] == report[1]:
@@ -30,9 +29,13 @@ def is_safe_with_problem_damper(report):
             return True
     return False
 
-safe_reports = [report for report in reports if is_safe(report)]
-print(len(safe_reports))
-safe_reports = [report for report in reports if is_safe(report) or is_safe_with_problem_damper(report)]
-print(len(safe_reports))
+def solve(filename):
+    reports = load_input(filename)
+    print(len([report for report in reports if is_safe(report)]))
+    print(len([report for report in reports if is_safe(report) or is_safe_with_problem_damper(report)]))
+    print()
+
+solve('example.txt')
+solve('input.txt')
 
 print("--- %s seconds ---" % (time.time() - start_time))

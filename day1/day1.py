@@ -6,11 +6,9 @@ from collections import defaultdict
 
 start_time = time.time()
 
-INPUT = 1
-FILENAME = ['example_1.txt', 'input_h.txt', 'input_w.txt'][INPUT]
-
-with open(FILENAME, 'r') as file:
-    input = [split(r'\s+', line) for line in file.read().split("\n") if line != ""]
+def load_input(filename):
+    with open(filename, 'r') as file:
+        return [split(r'\s+', line) for line in file.read().split("\n") if line != ""]
 
 def generate_location_ids_list(column, input):
     location_ids = [int(numbers[column]) for numbers in input]
@@ -29,10 +27,16 @@ def id_differences(ids1, ids2):
 def similarity_scores(ids1, ids2_counts):
     return [ids2_counts[id] * id for id in ids1]
 
-location_ids1 = generate_location_ids_list(0, input)
-location_ids2 = generate_location_ids_list(1, input)
-location_ids2_counts = count_location_ids(location_ids2)
+def solve(filename):
+    input = load_input(filename)
+    location_ids1 = generate_location_ids_list(0, input)
+    location_ids2 = generate_location_ids_list(1, input)
 
-print(sum(id_differences(location_ids1, location_ids2)))
-print(sum(similarity_scores(location_ids1, location_ids2_counts)))
+    print(sum(id_differences(location_ids1, location_ids2)))
+    print(sum(similarity_scores(location_ids1, count_location_ids(location_ids2))))
+    print()
+
+
+solve('example.txt')
+solve('input.txt')
 print("--- %s seconds ---" % (time.time() - start_time))

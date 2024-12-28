@@ -1,12 +1,9 @@
 #!/usr/bin/env python
-from collections import defaultdict
-from itertools import combinations
-import re
 import time
 
 start_time = time.time()
 
-INPUT = 2
+INPUT = 1
 FILENAME = ['example.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 REGEX = r'(\w{2})-(\w{2})'
 
@@ -52,4 +49,4 @@ for lock in locks:
             count += 1
 print(count)
 
-# print("--- %s seconds ---" % (time.time() - start_time))
+print("--- %s seconds ---" % (time.time() - start_time))

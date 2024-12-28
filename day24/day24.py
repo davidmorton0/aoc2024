@@ -5,7 +5,7 @@ import time
 
 start_time = time.time()
 
-INPUT = 3
+INPUT = 2
 FILENAME = ['example_1.txt', 'example_2.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 REGEX = r'(\w{2})-(\w{2})'
 

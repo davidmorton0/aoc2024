@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 INPUT = 1
-FILENAME = ['example_1.txt', 'input_h.txt', 'input_w.txt'][INPUT]
+FILENAME = ['example_1.txt', 'input.txt', 'input_w.txt'][INPUT]
 PRUNE_NUMBER = 16777216
 
 with open(FILENAME, 'r') as file:

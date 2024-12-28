@@ -6,7 +6,7 @@ import time
 
 start_time = time.time()
 
-INPUT = 4
+INPUT = 3
 FILENAME = ['example_1.txt', 'example_2.txt', 'example_3.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 DIGITS = [3, 5, 6, 45, 45][INPUT]
 
@@ -56,7 +56,6 @@ def check_values(wire_values):
 def calculate_value(wire_values, letter):
     result_values = get_values(wire_values, letter)
     result_values.sort()
-    # print([letter, result_values])
     return int(''.join([str(result[1]) for result in result_values[::-1]]), 2)
 
 def calculate(wire_values, connections):
