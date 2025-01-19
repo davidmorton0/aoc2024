@@ -2,7 +2,7 @@
 from collections import defaultdict
 
 INPUT = 1
-FILENAME = ['example_1.txt', 'input_w.txt', 'input_w.txt'][INPUT]
+FILENAME = ['example_1.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 MIN_CHEAT_SIZE_1 = [2, 100, 100][INPUT]
 MIN_CHEAT_SIZE_2 = [50, 100, 100][INPUT]
 
@@ -68,8 +68,6 @@ while path_locations:
     path.append(path_locations.pop(path_locations.index(loc)))
 path.append(end)
 
-print_track()
-
 shortcuts = []
 shortcuts2 = []
 for n in range(len(path)):
@@ -83,7 +81,6 @@ for x, y, n in shortcuts:
 
 sc = list(shortcuts_count.items())
 sc.sort()
-print(sc)
 print(sum(shortcuts_count.values()))
 
 shortcuts_count2 = defaultdict(lambda: 0)
@@ -93,5 +90,4 @@ for x, y, n in shortcuts2:
 
 sc2 = list(shortcuts_count2.items())
 sc2.sort()
-print(sc2)
 print(sum(shortcuts_count2.values()))

@@ -2,7 +2,7 @@
 from collections import defaultdict
 
 INPUT = 1
-FILENAME = ['example_1.txt', 'input_w.txt', 'input_w.txt'][INPUT]
+FILENAME = ['example_1.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 
 with open(FILENAME, 'r') as file:
     track = [list(line) for line in file.read().split("\n") if line != ""]
@@ -70,7 +70,6 @@ while track[end[1]][end[0]] == 'E':
     do_iteration(n)
     n += 1
 
-print_track()
 shortcuts = find_shortcuts()
 shortcuts_count = defaultdict(lambda: 0)
 shortcuts_100 = 0
@@ -79,5 +78,4 @@ for x, y, diff in shortcuts:
     if diff >= 100:
         shortcuts_100 += 1
 
-print(shortcuts_count)
 print(shortcuts_100)

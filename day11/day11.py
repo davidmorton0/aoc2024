@@ -1,10 +1,15 @@
 #!/usr/bin/env python
 from collections import defaultdict
+from time import time
 
-with open('example.txt', 'r') as file:
-    stones = defaultdict(lambda: 0)
-    for stone in [int(stone) for stone in file.read().split(' ')]:
-        stones[stone] += 1
+start_time = time()
+
+def load_input(filename):
+    with open(filename, 'r') as file:
+        stones = defaultdict(lambda: 0)
+        for stone in [int(stone) for stone in file.read().split(' ')]:
+            stones[stone] += 1
+    return stones
 
 def blink(stones):
     new_stones = defaultdict(lambda: 0)
@@ -26,7 +31,25 @@ def split_digits(stone):
     mid_position = int(len(stone_string) / 2)
     return [(int(stone_string[0:mid_position])), (int(stone_string[mid_position:]))]
 
-for _ in range(75):
-    stones = blink(stones)
+def print_total(stones, part):
+    print(f"Part {part}: {sum(stones.values())}")
 
-print(sum(stones.values()))
+def solve(filename):
+    stones = load_input(filename)
+
+    print(f"Filename: {filename}")
+
+    for _ in range(25):
+        stones = blink(stones)
+    print_total(stones, 1)
+
+    for _ in range(50):
+        stones = blink(stones)
+    print_total(stones, 2)
+    print()
+
+solve('example.txt')
+solve('input_h.txt')
+solve('input_w.txt')
+
+print("--- %s seconds ---" % (time() - start_time))

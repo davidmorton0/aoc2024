@@ -1,15 +1,14 @@
 #!/usr/bin/env python
-from collections import defaultdict
 from itertools import pairwise
+from collections import defaultdict
 
-INPUT = 0
-FILENAME = ['example_1.txt', 'input_w.txt', 'input_w.txt'][INPUT]
+INPUT = 2
+FILENAME = ['example_1.txt', 'example_2.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 PRUNE_NUMBER = 16777216
 MAX_SECRET_NUMBERS = 2000
 
 with open(FILENAME, 'r') as file:
     secret_numbers = [int(line) for line in file.read().split("\n") if line != ""]
-# secret_numbers = [123]
 
 def mix(number1, number2):
     return number1 ^ number2
@@ -26,27 +25,26 @@ def calculate_nth_secret_number(sn, n):
     for _ in range(n):
         sn = calculate_next_secret_number(sn)
     return sn
-price_change_sequences_count = defaultdict(lambda: 0)
 
+price_change_sequences_count = defaultdict(lambda: 0)
+secret_numbers_total = 0
 for secret_number in secret_numbers:
     prices = []
-    for _ in range(MAX_SECRET_NUMBERS):
-        prices.append(int(str(secret_number)[-1]))
-        secret_number = calculate_next_secret_number(secret_number)
-
     price_changes = []
-    for m, n in pairwise(prices):
-        price_changes.append(n - m)
-
-    price_change_sequences = {}
-    for n in range(len(price_changes) - 4):
-        price_change_string = ''.join([str(m) for m in price_changes[n:n+4]])
-        if price_change_string not in list(price_change_sequences.keys()):
-            price_change_sequences[price_change_string] = prices[n+4]
-
-    for pcs, count in price_change_sequences.items():
-        price_change_sequences_count[pcs] += count
+    price_change_sequences = []
+    for _ in range(MAX_SECRET_NUMBERS):
+        prices.append(secret_number % 10)
+        if len(prices) >= 2:
+            price_changes.append(prices[-1] - prices[-2])
+        if len(prices) >= 4:
+            price_change_string = ''.join([str(m) for m in price_changes[-4:]])
+            if price_change_string not in price_change_sequences:
+                price_change_sequences.append(price_change_string)
+                price_change_sequences_count[price_change_string] += prices[-1]
+        secret_number = calculate_next_secret_number(secret_number)
+    secret_numbers_total += secret_number
 
 answer = [[v, k] for k, v in price_change_sequences_count.items()]
 answer.sort()
+print(secret_numbers_total)
 print(answer[-10:])

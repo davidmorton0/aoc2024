@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 
 INPUT = 1
-FILENAME = ['example_1.txt', 'input_w.txt', 'input_w.txt'][INPUT]
+FILENAME = ['example_1.txt', 'input_h.txt', 'input_w.txt'][INPUT]
 PRUNE_NUMBER = 16777216
 
 with open(FILENAME, 'r') as file:
     secret_numbers = [int(line) for line in file.read().split("\n") if line != ""]
-
-print(secret_numbers)
 
 def mix(number1, number2):
     return number1 ^ number2
