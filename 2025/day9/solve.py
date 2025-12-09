@@ -35,28 +35,49 @@ class Solve:
         self.create_grid(coordinates)
         self.paint_outline(coordinates)
         print("\n")
-        self.print_grid()
+        self.print_grid(self.grid)
 
     def create_grid(self, coordinates):
         x_coordinates = [c[0] for c in coordinates]
+        x_coordinates = list(set(x_coordinates))
         x_coordinates.sort()
         y_coordinates = [c[1] for c in coordinates]
+        y_coordinates = list(set(y_coordinates))
         y_coordinates.sort()
         print(x_coordinates)
         print(y_coordinates)
-        line = []
-        line.append(
-            self.rectangle(
-                0, 0, x_coordinates[0], y_coordinates[0], 0, 0
-            )
+        
+        grid = []
+        
+        line = self.generate_line(x_coordinates, 0, y_coordinates[0] - 1, 0)
+        grid.append(line)
+        line = self.generate_line(x_coordinates, y_coordinates[0], y_coordinates[0], 1)
+        grid.append(line)
+        for y in y_coordinates[1:]:
+            previous_y_end = grid[-1][0]["y_end"] 
+            if previous_y_end + 1 <= y - 1:
+                line = self.generate_line(x_coordinates, previous_y_end + 1 , y - 1, grid[-1][0]["y_index"])
+                grid.append(line)
+            line = self.generate_line(x_coordinates, y, y, grid[-1][0]["y_index"])
+            grid.append(line)
+        self.grid = grid
+
+    
+    def generate_line(self, x_coordinates, y_start, y_end, y_index):
+        line = [
+            self.rectangle(0, y_start, x_coordinates[0] - 1, y_end, 0, y_index),
+            self.rectangle(x_coordinates[0], y_start, x_coordinates[0], y_end, 1, y_index)
+        ]
+        for x in x_coordinates[1:]:
+            if line[-1]["x_end"] < x - 1:
+                line.append(
+                    self.rectangle(line[-1]["x_end"] + 1, y_start, x - 1, y_end, line[-1]["x_index"] + 1, y_index)
+                )
+            line.append(self.rectangle(x, y_start, x, y_end, line[-1]["x_index"] + 1, 0)
         )
-        for x in x_coordinates:
-            line.append(
-            self.rectangle(
-                line[-1]["x_end"], line[-1]["y_end"], x, 0, line[-1]["x_index"] + 1, 0
-            )
-        )
-        print(line)
+        # for c in line:
+        #     print(c)
+        return line
 
 
 
@@ -88,15 +109,26 @@ class Solve:
             "y_end": max(y1, y2),
             "x_index": xi,
             "y_index": yi,
-            "size": abs(x1 - x2) * abs(y1 - y2)
+            "size": abs(x1 - x2) * abs(y1 - y2),
+            "colour": "."
         }
 
-    def print_grid(self):
-        pass
-        # for line in self.grid:
-        #     print("".join(line))
+    def print_grid(self, grid):
+        for line in grid:
+            print("".join([c["colour"] for c in line]))
 
     def paint_outline(self, coordinates):
+        max_x_index = self.grid[0][-1]["x_index"]
+        max_y_index = self.grid[-1][0]["y_index"]
+        for x1, y1 in coordinates:
+            for x2, y2 in coordinates:
+                if y1 == y2:
+                    for xi in range(0, max_x_index):
+                        x_a = min(x1, x2)
+                        x_b = max(x1, x2)
+                        
+            
+        
         pass
         # for n, [c_x, c_y] in enumerate(coordinates):
         #     p_x, p_y = coordinates[n-1]
