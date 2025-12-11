@@ -21,9 +21,10 @@ class Solve:
     def solve_a(self, filename):
         self.load_input(filename)
         print(self.connections)
-        paths = [["you"]]
+        paths = [["svr"]]
         
-        while paths: 
+        while paths:
+            print(paths)
             paths = self.find_new_paths(paths)
         
         print(self.finished_paths)
@@ -35,8 +36,10 @@ class Solve:
         for path in paths:
             new_paths = self.find_next_connections(path)
             for new_path in new_paths:
-                if new_path[-1] == "out":
+                if new_path[-1] == "tty":
                     self.finished_paths.append(new_path)
+                elif new_path[-1] == "out":
+                    pass
                 else:
                     next_paths.append(new_path)
         return next_paths
@@ -46,7 +49,7 @@ class Solve:
         new_connections = self.connections[path[-1]]
         new_paths = []
         for new_connection in new_connections:
-            print(path)
+            # print(path)
             if new_connection in path:
                 continue
             new_path = deepcopy(path)
@@ -80,7 +83,7 @@ class Solve:
         return next_paths
     
     def generate_path_sizes(self):
-        path_sizes = {"dac": 1}
+        path_sizes = {"svr": 1}
         path_sizes_length = 0
         while len(path_sizes) != path_sizes_length:
             path_sizes_length = len(path_sizes)
