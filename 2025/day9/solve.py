@@ -32,129 +32,52 @@ class Solve:
     def solve_b(self, filename):
         coordinates = self.load_input(filename)
         print(coordinates)
-        self.create_grid(coordinates)
-        self.paint_outline(coordinates)
         print("\n")
-        self.print_grid(self.grid)
-
-    def create_grid(self, coordinates):
-        x_coordinates = [c[0] for c in coordinates]
-        x_coordinates = list(set(x_coordinates))
-        x_coordinates.sort()
-        y_coordinates = [c[1] for c in coordinates]
-        y_coordinates = list(set(y_coordinates))
-        y_coordinates.sort()
-        print(x_coordinates)
-        print(y_coordinates)
+        rectangles = self.calculate_rectangles(coordinates)
+        for rectangle in rectangles:
+            if self.valid_rectangle(rectangle, coordinates):
+                print(rectangle)
+                return
         
-        grid = []
-        
-        line = self.generate_line(x_coordinates, 0, y_coordinates[0] - 1, 0)
-        grid.append(line)
-        line = self.generate_line(x_coordinates, y_coordinates[0], y_coordinates[0], 1)
-        grid.append(line)
-        for y in y_coordinates[1:]:
-            previous_y_end = grid[-1][0]["y_end"] 
-            if previous_y_end + 1 <= y - 1:
-                line = self.generate_line(x_coordinates, previous_y_end + 1 , y - 1, grid[-1][0]["y_index"])
-                grid.append(line)
-            line = self.generate_line(x_coordinates, y, y, grid[-1][0]["y_index"])
-            grid.append(line)
-        self.grid = grid
 
+    def calculate_rectangles(self, coordinates):
+        rectangles = []
+        for n, [x1, y1] in enumerate(coordinates):
+            for m, [x2, y2] in enumerate(coordinates):
+                if n == m:
+                    continue
+                area = ((abs(x1 - x2) + 1) * (abs(y1 - y2) + 1))
+                rectangles.append([[min(x1, x2) + 1, min(y1, y2) + 1], [max(x1, x2) - 1, max(y1, y2) - 1], area])
+        rectangles.sort(key=lambda r : -r[2])
+        return rectangles
     
-    def generate_line(self, x_coordinates, y_start, y_end, y_index):
-        line = [
-            self.rectangle(0, y_start, x_coordinates[0] - 1, y_end, 0, y_index),
-            self.rectangle(x_coordinates[0], y_start, x_coordinates[0], y_end, 1, y_index)
-        ]
-        for x in x_coordinates[1:]:
-            if line[-1]["x_end"] < x - 1:
-                line.append(
-                    self.rectangle(line[-1]["x_end"] + 1, y_start, x - 1, y_end, line[-1]["x_index"] + 1, y_index)
-                )
-            line.append(self.rectangle(x, y_start, x, y_end, line[-1]["x_index"] + 1, 0)
-        )
-        # for c in line:
-        #     print(c)
-        return line
+    def valid_rectangle(self, rectangle, coordinates):
+        for n in range(0, len(coordinates)):
+            x1, y1 = coordinates[n - 1]
+            x2, y2 = coordinates[n]
+            if self.point_in_rectangle(x1, y1, rectangle) or self.point_in_rectangle(x2, y2, rectangle):
+                return False
+            if self.line_crosses_rectangle(x1, y1, x2, y2, rectangle):
+                return False
+        return True
+    
+    def point_in_rectangle(self, x, y, rectangle):
+        x1, y1 = rectangle[0]
+        x2, y2 = rectangle[1]
+        return x > x1 and x < x2 and y > y1 and y < y2
 
-
-
-        # max_x, max_y = coordinates[0]
-        # min_x, min_y = coordinates[0]
-        # for x, y in coordinates:
-        #     if x > max_x:
-        #         max_x = x
-        #     elif x < min_x:
-        #         min_x = x
-        #     if y > max_y:
-        #         max_y = y
-        #     elif y < min_y:
-        #         min_y = y
-        # self.offset_x = min_x - 1
-        # self.offset_y = min_y - 1
-        # self.range_x = max_x - self.offset_x + 1
-        # self.range_y = max_y - self.offset_y + 1
-        # print(self.offset_x, self.range_x)
-        # print(self.offset_y, self.range_y)
-        # for y in range(self.offset_y, self.offset_y + self.range_y + 1):
-        #     self.grid.append(list("." * (self.range_x + 1)))
-
-    def rectangle(self, x1, y1, x2, y2, xi, yi):
-        return {
-            "x_start": min(x1, x2),
-            "x_end": max(x1, x2),
-            "y_start": min(y1, y2),
-            "y_end": max(y1, y2),
-            "x_index": xi,
-            "y_index": yi,
-            "size": abs(x1 - x2) * abs(y1 - y2),
-            "colour": "."
-        }
-
-    def print_grid(self, grid):
-        for line in grid:
-            print("".join([c["colour"] for c in line]))
-
-    def paint_outline(self, coordinates):
-        max_x_index = self.grid[0][-1]["x_index"]
-        max_y_index = self.grid[-1][0]["y_index"]
-        for x1, y1 in coordinates:
-            for x2, y2 in coordinates:
-                if y1 == y2:
-                    for xi in range(0, max_x_index):
-                        x_a = min(x1, x2)
-                        x_b = max(x1, x2)
-                        
-            
-        
-        pass
-        # for n, [c_x, c_y] in enumerate(coordinates):
-        #     p_x, p_y = coordinates[n-1]
-        #     print([c_x, c_y], [p_x, p_y])
-        #     if p_x == c_x:
-        #         print(list(range(min([c_y, p_y]), max(c_y, p_y + 1))))
-        #         for y in range(min([c_y, p_y]), max(c_y, p_y) + 1):
-        #             self.set_value(c_x, y, "R")
-        #     else:
-        #         print(list(range(min([c_x, p_x]), max(c_x, p_x) + 1)))
-        #         for x in range(min([c_x, p_x]), max(c_x, p_x) + 1):
-        #             self.set_value(x, c_y, "R")
-
-    # def set_value(self, x, y, colour):
-    #     self.grid[y - self.offset_y][x - self.offset_x] = colour
-
-
-
-
-
-
+    def line_crosses_rectangle(self, xa, ya, xb, yb, rectangle):
+        x1, y1 = rectangle[0]
+        x2, y2 = rectangle[1]
+        if ya == yb:
+            return min(xa, xb) < x1 and max(xa, xb) > x2 and ya > y1 and ya < y2
+        else:
+            return min(ya, yb) < y1 and max(ya, yb) > y2 and xa > x1 and xa < x2
 
 start_time = time.time()
 # Solve().solve_a('example.txt')
 # Solve().solve_a('input.txt')
 print("\n")
-Solve().solve_b('example.txt')
-# Solve().solve_b('input.txt')
+# Solve().solve_b('example.txt')
+Solve().solve_b('input.txt')
 print("--- %s seconds ---" % (time.time() - start_time))
