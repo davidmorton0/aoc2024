@@ -2,7 +2,10 @@
 import time
 from itertools import product
 from sympy import symbols, Eq, solve
+import numpy as np
+
 DIGITS = "abcdefghijklmn"
+
 
 class Solve:
     def __init__(self):
@@ -76,19 +79,71 @@ class Solve:
             count = self.calculate_presses_b(machine)
             # print(count)
             # total += count
-        print(total)
+        # print(total)
     
     def calculate_presses_b(self, machine):        
         joltage = machine["joltage"]
         buttons = machine["buttons"]
-        a, b, c, d, e, f = symbols("a b c d e f", integer=True)
-        eq1 = Eq(d + f, 3)
-        eq2 = Eq(b + f, 5)
-        eq3 = Eq(c + d + e, 4)
-        eq4 = Eq(a + b + d, 7)
-        solution = solve([eq1,eq2, eq3, eq4], (a,b,c,d,e,f))
-        print(solution)
+        known_values = [[], []]
+        print(buttons)
+        print(joltage)
+        print(known_values)
+        print("\n")
+        print(self.check_if_valuse_can_be_calculated(buttons, joltage, known_values))
+        print(buttons)
+        print(joltage)
+        print(known_values)
+        print("\n")
+        print(self.check_if_valuse_can_be_calculated(buttons, joltage, known_values))
+        print("\n")
+        print("\n")
+            
+            
         
+    def check_if_valuse_can_be_calculated(self, buttons, joltage, known_values):
+        buttons_counts = [[] for _ in range(len(joltage))]
+        for i, button in enumerate(buttons):
+            if i in known_values[0]:
+                continue
+            for connection in button:
+                buttons_counts[connection].append(i)
+        for i, button_count in enumerate(buttons_counts):
+            if len(button_count) == 1:
+                calculable_buttons = [button_count[0], i]
+                if calculable_buttons:
+                    known_values[0].append(calculable_buttons[0])
+                    known_values[1].append(calculable_buttons[1])
+                    for value in buttons[calculable_buttons[0]]:
+                        joltage[value] -= calculable_buttons[1]
+                    return calculable_buttons
+        return []
+                
+        #         return [i, joltage[i]]
+        # calculatable_connection = [button_count for button_count in buttons_counts if button_count < 2]
+        # if calculatable_connection:
+        #     value = calculatable_connection[0]
+        #     print(value)
+        #     for i, button in enumerate(buttons):
+        #         if value in button:
+        #             return [value, i]
+        return False
+        # for i in range(0, len(joltage)):
+        #     if 
+        
+        # equations = self.calculate_equations(buttons, joltage)
+        # print(equations)
+        # self.remove_duplicates(equations, joltage)
+        # print(equations)
+        # print("\n")
+        
+        
+        # A = np.array([[1, 0, 1, 1, 0], [0, 0, 0, 1, 1], [1, 1, 0, 1, 1], [1, 1, 0, 0, 1], [1, 0, 1, 0, 1]])
+        # B = np.array([7, 5, 12, 7, 2])
+        # B = B.T
+        # x = np.linalg.solve(A, B)
+        # print(x)
+        # A = np.array([[1, 0, 1, 1, 0, 7], [0, 0, 0, 1, 1, 5], [1, 1, 0, 1, 1, 12], [1, 1, 0, 0, 1, 7], [1, 0, 1, 0, 1, 2]])
+        # print(np.linalg.solve(A))
         # states = self.generate_state_b(len(buttons), max(joltage))
         # lowest = None
         # for state in states:
@@ -101,12 +156,32 @@ class Solve:
         #     #     if lowest is None or button_presses < lowest:
         #     #         lowest = button_presses
         # return lowest
+    
+    def calculate_equations(self, buttons, joltage):
+        arrays = []
+        for n in range(0, len(joltage)):
+            array = []
+            for button in buttons:
+                if n in button:
+                    array.append(1)
+                else:
+                    array.append(0)
+            arrays.append(array)
+        arrays.append(joltage)
+        return arrays
+    
+    def remove_duplicates(self, equations, joltage):
+        for v, equation in enumerate(equations):
+            if equation in equations[v+1:]:
+                i = equations[v+1:].index(equation)
+                if (joltage[i + v + 1] == joltage[v]):
+                    print(equations.pop(v), joltage.pop(v))
 
-    def generate_state_b(self, length, max_value):
-        states = list(product(range(0, max_value + 1), repeat=length))
-        for i in range(0, length):
-            states.append(str(bin(i))[2:].rjust(length, '0'))
-        return states
+    # def generate_state_b(self, length, max_value):
+    #     states = list(product(range(0, max_value + 1), repeat=length))
+    #     for i in range(0, length):
+    #         states.append(str(bin(i))[2:].rjust(length, '0'))
+    #     return states
 
 start_time = time.time()
 # Solve().solve_a('example.txt')
