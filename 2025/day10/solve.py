@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import time
-from itertools import product
-from sympy import symbols, Eq, solve
-import numpy as np
+from math import inf
 
 DIGITS = "abcdefghijklmn"
 
@@ -75,7 +73,7 @@ class Solve:
     def solve_b(self, filename):
         self.load_input(filename)
         total = 0
-        for machine in self.machines[2:3]:
+        for machine in self.machines:
             joltage = machine["joltage"]
             buttons = machine["buttons"]
             number_of_buttons = len(buttons)
@@ -134,14 +132,60 @@ class Solve:
             
             print(f"equations: {equations}")
             print(f"pivots: {pivots}")
-            print(f"free values: {free_values}")    
+            print(f"free values: {free_values}")
+            print("Calculating minimum")
+            self.calculate_minimum(equations, free_values)
             
             print("Next machine\n")
     
     def calculate_minimum(self, equations, free_values):
-        free_value = 0
-        # for equation in equations:
+        total = [0] * len(equations[0])
+        max_value = max([equation[-1] for equation in equations])
+        states = [[]]
+        for free_value in free_values:
+            new_states = []
+            for state in states:
+                for v in range(0, max_value + 1):
+                    new_state = state.copy()
+                    new_state.append(v)
+                    new_states.append(new_state)
+            states = new_states
+        print(max_value)
+        print(f"states: {states}")
+        # free_value = free_values[0]
+        total = 0
+        minimum = inf
+        for state in states:
+            total = sum(state)
+            negative = False
+            for equation in equations:
+                total_fv = 0
+                for n, fv in enumerate(free_values):
+                    total_fv += state[n] * equation[fv]
+                # fv = [f for fv in enumerate(free_values)]
+                # for free_value in free_values:
+                #     fv = state[free_values.index(free_value)]
+                
+                number_of_presses = equation[-1] - total_fv
+                if number_of_presses < 0:
+                    negative = True
+                total += number_of_presses
+                print(f"free values {free_values} = {state} for equation {equation} gives number of presses {number_of_presses}")
+            print(f"Total for free values {free_values} = {state} is {total}")
             
+
+            
+        # for fv in range(0, max_value):
+        #     for equation in equations:
+        #         number_of_presses = -fv * equation[free_value] + equation[-1]
+        #         if number_of_presses < 0:
+        #             negative = True
+        #         total += number_of_presses
+        #         print(f"free value {fv} for equation {equation} gives number of presses {number_of_presses}")
+        #     print(f"Total for free value {fv} is {total}")
+            if negative == False and total < minimum:
+                minimum = total
+        print(f"minimum: {minimum}")            
     
     def find_pivot(self, equations, column, start_y):
         column = [i for i, row in enumerate(equations[start_y:]) if row[column] != 0]
@@ -309,8 +353,8 @@ start_time = time.time()
 # Solve().solve_a('example.txt')
 # Solve().solve_a('input_2.txt')
 print("\n")
-Solve().solve_b('example.txt')
-# Solve().solve_b('input.txt')
+# Solve().solve_b('example.txt')
+Solve().solve_b('input.txt')
 print("--- %s seconds ---" % (time.time() - start_time))
 
 # from sympy import symbols, Eq, solve
