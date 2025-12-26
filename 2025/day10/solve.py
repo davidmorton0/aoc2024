@@ -72,8 +72,8 @@ class Solve:
 
     def solve_b(self, filename):
         self.load_input(filename)
-        start_machine = 14
-        end_machine = 15
+        start_machine = 0
+        end_machine = -1
         total = 0
         for machine_number, machine in enumerate(self.machines[start_machine:end_machine]):
             print(f"Starting machine: {machine_number}")
@@ -84,7 +84,8 @@ class Solve:
             
             equations = self.calculate_equations(buttons, joltage)
             equations.sort(reverse=True)
-            print("Calculate equations")
+            if VERBOSE:
+                print("Calculate equations")
             self.print_equations(equations)
             pivots = []
             free_values = []
@@ -94,47 +95,60 @@ class Solve:
                 # find pivot column
                 yp = self.find_pivot(equations, xp, start_y)
                 if yp is None:
-                    print(f"adding free value {xp}")
+                    if VERBOSE:
+                        print(f"adding free value {xp}")
                     free_values.append(xp)
                     continue
-                print(f"pivot = {[xp, yp]}")
+                if VERBOSE:
+                    print(f"pivot = {[xp, yp]}")
                 pivots.append([xp, yp])
             
                 # swap row if needed
-                print("Checking for row swap")
+                if VERBOSE:
+                    print("Checking for row swap")
                 if yp != start_y:
-                    print(f"Swapping {start_y} and {yp}")
+                    if VERBOSE:
+                        print(f"Swapping {start_y} and {yp}")
                     equations[start_y], equations[yp] = equations[yp], equations[start_y]
                     self.print_equations(equations)
                 else:
-                    print("Row swap not needed")
+                    if VERBOSE:
+                        print("Row swap not needed")
                 yp = start_y
                 start_y += 1
             
                 # normalise row if needed
                 if equations[yp][xp] != 1:
                     factor = equations[yp][xp]
-                    print(f"Normalising row {yp}")
+                    if VERBOSE:
+                        print(f"Normalising row {yp}")
                     equations[yp] = [a / factor for a in equations[yp]]
                     self.print_equations(equations)
                 else:
-                    print(f"Normalising row {yp} not needed")
+                    if VERBOSE:
+                        print(f"Normalising row {yp} not needed")
             
                 # subtract from others rows if 1 in pivot column
-                print("Subtracting row if needed")
+                if VERBOSE:
+                    print("Subtracting row if needed")
                 for y in range(0, joltage_length):
                     if y != yp and equations[y][xp] != 0:
-                        print(f"Subtracting row {yp} from row {y}")
+                        if VERBOSE:
+                            print(f"Subtracting row {yp} from row {y}")
                         equations[y] = self.normalise(equations[y], equations[yp], equations[y][xp])
                         self.print_equations(equations)
                 self.print_equations(equations)
-                print(pivots)
+                if VERBOSE:
+                    print(pivots)
             
             self.print_equations(equations)
             print(f"pivots: {pivots}")
             print(f"free values: {free_values}")
-            print("Calculating minimum")
-            total += self.calculate_minimum(equations, free_values)
+            if len(free_values) < 3:
+                print("Calculating minimum")
+                total += self.calculate_minimum(equations, free_values)
+            else:
+                print(f"Skipping minimum cal: machine{machine_number}")
 
             # if total == inf:
             #     print(machine_number)
@@ -154,15 +168,17 @@ class Solve:
                     new_state.append(v)
                     new_states.append(new_state)
             states = new_states
-        print(max_value)
-        print(f"states: {states}")
+        print(f"max value: {max_value}")
+        if VERBOSE:
+            print(f"states: {states}")
 
         minimum = inf
         for state in states:
             value = self.calculate_value(equations, free_values, state)
             if value < minimum:
                 minimum = value
-        print(f"minimum: {minimum}")
+        if VERBOSE:
+            print(f"minimum: {minimum}")
         return minimum
 
 
@@ -181,7 +197,8 @@ class Solve:
             if VERBOSE:
                 print(
                     f"free values {free_values} = {state} for equation {equation} gives number of presses {number_of_presses}")
-        print(f"Total for free values {free_values} = {state} is {total}")
+        if VERBOSE:
+            print(f"Total for free values {free_values} = {state} is {total}")
         return total
 
     def find_pivot(self, equations, column, start_y):
@@ -193,7 +210,8 @@ class Solve:
         if equations[yp][xp] == 0:
             for y in range(yp + 1, joltage_length):
                 if equations[y][xp] == 1:
-                    print(f"Swapping row {yp} and {y}")
+                    if VERBOSE:
+                        print(f"Swapping row {yp} and {y}")
                     equations[y][xp], equations[yp][xp] = equations[yp][xp], equations[y][xp]
                     return
 
@@ -202,7 +220,8 @@ class Solve:
         return [a - b * factor for a, b in calculations]
 
     def print_equations(self, equations):
-        print(f"Equations: {[[float(a) for a in equation] for equation in equations]}")
+        if VERBOSE:
+            print(f"Equations: {[[float(a) for a in equation] for equation in equations]}")
 
 
     def calculate_equations(self, buttons, joltage):
