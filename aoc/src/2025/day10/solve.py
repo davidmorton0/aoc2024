@@ -2,6 +2,7 @@
 import time
 from math import inf, floor, lcm
 from fractions import Fraction
+from minimum_finder import MinimumFinder
 
 VERBOSE = False
 SKIPPED = []
@@ -74,7 +75,7 @@ class Solve:
     def solve_b(self, filename):
         self.load_input(filename)
         start_machine = 0
-        end_machine = -1
+        end_machine = 15
         total = 0
         for machine_number, machine in enumerate(self.machines[start_machine:end_machine]):
             print(f"Starting machine: {machine_number}")
@@ -147,7 +148,8 @@ class Solve:
             print(f"free values: {free_values}")
             if len(free_values) < 3:
                 print("Calculating minimum")
-                total += self.calculate_minimum(equations, free_values)
+                minimum_finder = MinimumFinder(equations, free_values)
+                total += minimum_finder.call()
                 # if total.denominator > 1:
                 #     print(machine_number)
                 #     breakpoint()
@@ -163,85 +165,85 @@ class Solve:
             print("Next machine\n")
         print(f"Skipped: {SKIPPED}")
     
-    def calculate_minimum(self, equations, free_values):
-        self.calculate_possible_values(equations, free_values)
-        max_value = floor(max([equation[-1] * 3 for equation in equations]))
-        states = [[]]
-        for _ in free_values:
-            new_states = []
-            for state in states:
-                for v in range(0, max_value + 1):
-                    new_state = state.copy()
-                    new_state.append(v)
-                    new_states.append(new_state)
-            states = new_states
-        print(f"max value: {max_value}")
-        if VERBOSE:
-            print(f"states: {states}")
+    # def calculate_minimum(self, equations, free_values):
+    #     self.calculate_possible_values(equations, free_values)
+    #     max_value = floor(max([equation[-1] * 3 for equation in equations]))
+    #     states = [[]]
+    #     for _ in free_values:
+    #         new_states = []
+    #         for state in states:
+    #             for v in range(0, max_value + 1):
+    #                 new_state = state.copy()
+    #                 new_state.append(v)
+    #                 new_states.append(new_state)
+    #         states = new_states
+    #     print(f"max value: {max_value}")
+    #     if VERBOSE:
+    #         print(f"states: {states}")
+    #
+    #     minimum = inf
+    #     for state in states:
+    #         value = self.calculate_value(equations, free_values, state)
+    #         if value < minimum:
+    #             minimum = value
+    #     if VERBOSE:
+    #         print(f"minimum: {minimum}")
+    #     return minimum
 
-        minimum = inf
-        for state in states:
-            value = self.calculate_value(equations, free_values, state)
-            if value < minimum:
-                minimum = value
-        if VERBOSE:
-            print(f"minimum: {minimum}")
-        return minimum
-
-    def calculate_possible_values(self, equations, free_values):
-        possible_values = {}
-        for free_value in free_values:
-            possible_values[free_value] = {
-                "position": free_value,
-                "minimum": 0,
-                "maximum": inf,
-                "denominator": 1,
-                "numerator": 1
-            }
-        print(possible_values)
-        for equation in equations:
-            fvs = []
-            for free_value in free_values:
-                if equation[free_value] != 0:
-                    fvs.append([free_value, equation[free_value], equation[-1]])
-            print(fvs)
-            if len(fvs) == 1:
-                fv = possible_values[fvs[0][0]]
-                fv["numerator"] = lcm(fv["numerator"], fvs[0][1].denominator)
-                fv["denominator"] = lcm(fv["denominator"], fvs[0][1].numerator)
-                if fvs[0][1] > 0:
-                    fv["maximum"] = min(fv["maximum"], floor(fvs[0][2] / fvs[0][1]))
-        for equation in equations:
-            fvs = []
-            for free_value in free_values:
-                if equation[free_value] != 0:
-                    fvs.append([free_value, equation[free_value], equation[-1]])
-            if len(fvs) == 2:
-                fv1 = possible_values[fvs[0][0]]
-                fv2 = possible_values[fvs[1][0]]
-                # if fv1["maximum"] < inf:
-                #     val1 =
-
-        print(possible_values)
-
-    def calculate_value(self, equations, free_values, state):
-        total = sum(state)
-
-        for equation in equations:
-            total_fv = 0
-            for n, fv in enumerate(free_values):
-                total_fv += state[n] * equation[fv]
-
-            number_of_presses = equation[-1] - total_fv
-            if number_of_presses < 0:
-                return inf
-            total += number_of_presses
-            if VERBOSE:
-                print(
-                    f"free values {free_values} = {state} for equation {equation} gives number of presses {number_of_presses}")
-        if VERBOSE:
-            print(f"Total for free values {free_values} = {state} is {total}")
-        return total
+    # def calculate_possible_values(self, equations, free_values):
+    #     possible_values = {}
+    #     for free_value in free_values:
+    #         possible_values[free_value] = {
+    #             "position": free_value,
+    #             "minimum": 0,
+    #             "maximum": inf,
+    #             "denominator": 1,
+    #             "numerator": 1
+    #         }
+    #     print(possible_values)
+    #     for equation in equations:
+    #         fvs = []
+    #         for free_value in free_values:
+    #             if equation[free_value] != 0:
+    #                 fvs.append([free_value, equation[free_value], equation[-1]])
+    #         print(fvs)
+    #         if len(fvs) == 1:
+    #             fv = possible_values[fvs[0][0]]
+    #             fv["numerator"] = lcm(fv["numerator"], fvs[0][1].denominator)
+    #             fv["denominator"] = lcm(fv["denominator"], fvs[0][1].numerator)
+    #             if fvs[0][1] > 0:
+    #                 fv["maximum"] = min(fv["maximum"], floor(fvs[0][2] / fvs[0][1]))
+    #     for equation in equations:
+    #         fvs = []
+    #         for free_value in free_values:
+    #             if equation[free_value] != 0:
+    #                 fvs.append([free_value, equation[free_value], equation[-1]])
+    #         if len(fvs) == 2:
+    #             fv1 = possible_values[fvs[0][0]]
+    #             fv2 = possible_values[fvs[1][0]]
+    #             # if fv1["maximum"] < inf:
+    #             #     val1 =
+    #
+    #     print(possible_values)
+    #
+    # def calculate_value(self, equations, free_values, state):
+    #     total = sum(state)
+    #
+    #     for equation in equations:
+    #         total_fv = 0
+    #         for n, fv in enumerate(free_values):
+    #             total_fv += state[n] * equation[fv]
+    #
+    #         number_of_presses = equation[-1] - total_fv
+    #         if number_of_presses < 0:
+    #             return inf
+    #         total += number_of_presses
+    #         if VERBOSE:
+    #             print(
+    #                 f"free values {free_values} = {state} for equation {equation} gives number of presses {number_of_presses}")
+    #     if VERBOSE:
+    #         print(f"Total for free values {free_values} = {state} is {total}")
+    #     return total
 
     def find_pivot(self, equations, column, start_y):
         column = [i for i, row in enumerate(equations[start_y:]) if row[column] != 0]
@@ -284,6 +286,6 @@ start_time = time.time()
 # Solve().solve_a('example.txt')
 # Solve().solve_a('input_2.txt')
 print("\n")
-Solve().solve_b('example.txt')
-# Solve().solve_b('input.txt')
+# Solve().solve_b('example.txt')
+Solve().solve_b('input.txt')
 print("--- %s seconds ---" % (time.time() - start_time))
