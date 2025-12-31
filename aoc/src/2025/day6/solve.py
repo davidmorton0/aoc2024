@@ -31,7 +31,7 @@ class Solve:
         return total
 
     def load_input(self, filename):
-        with open(filename, 'r') as file:
+        with open(f"src/2025/day6/{filename}", 'r') as file:
             return file.read().split("\n")
         
     def find_problem_starts(self, puzzle_input):

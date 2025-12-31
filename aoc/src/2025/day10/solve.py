@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 import time
-from math import inf, floor
+from math import inf, floor, lcm
 from fractions import Fraction
 
 VERBOSE = False
+SKIPPED = []
 
 class Solve:
     def __init__(self):
@@ -84,9 +85,9 @@ class Solve:
             
             equations = self.calculate_equations(buttons, joltage)
             equations.sort(reverse=True)
-            if VERBOSE:
-                print("Calculate equations")
-            self.print_equations(equations)
+
+            print("Initial equations:")
+            self.print_equations(equations, True)
             pivots = []
             free_values = []
             start_y = 0
@@ -141,14 +142,18 @@ class Solve:
                 if VERBOSE:
                     print(pivots)
             
-            self.print_equations(equations)
+            self.print_equations(equations, True)
             print(f"pivots: {pivots}")
             print(f"free values: {free_values}")
             if len(free_values) < 3:
                 print("Calculating minimum")
                 total += self.calculate_minimum(equations, free_values)
+                # if total.denominator > 1:
+                #     print(machine_number)
+                #     breakpoint()
             else:
                 print(f"Skipping minimum cal: machine{machine_number}")
+                SKIPPED.append(machine_number)
 
             # if total == inf:
             #     print(machine_number)
@@ -156,8 +161,10 @@ class Solve:
 
             print(f"total: {total}")
             print("Next machine\n")
+        print(f"Skipped: {SKIPPED}")
     
     def calculate_minimum(self, equations, free_values):
+        self.calculate_possible_values(equations, free_values)
         max_value = floor(max([equation[-1] * 3 for equation in equations]))
         states = [[]]
         for _ in free_values:
@@ -181,6 +188,41 @@ class Solve:
             print(f"minimum: {minimum}")
         return minimum
 
+    def calculate_possible_values(self, equations, free_values):
+        possible_values = {}
+        for free_value in free_values:
+            possible_values[free_value] = {
+                "position": free_value,
+                "minimum": 0,
+                "maximum": inf,
+                "denominator": 1,
+                "numerator": 1
+            }
+        print(possible_values)
+        for equation in equations:
+            fvs = []
+            for free_value in free_values:
+                if equation[free_value] != 0:
+                    fvs.append([free_value, equation[free_value], equation[-1]])
+            print(fvs)
+            if len(fvs) == 1:
+                fv = possible_values[fvs[0][0]]
+                fv["numerator"] = lcm(fv["numerator"], fvs[0][1].denominator)
+                fv["denominator"] = lcm(fv["denominator"], fvs[0][1].numerator)
+                if fvs[0][1] > 0:
+                    fv["maximum"] = min(fv["maximum"], floor(fvs[0][2] / fvs[0][1]))
+        for equation in equations:
+            fvs = []
+            for free_value in free_values:
+                if equation[free_value] != 0:
+                    fvs.append([free_value, equation[free_value], equation[-1]])
+            if len(fvs) == 2:
+                fv1 = possible_values[fvs[0][0]]
+                fv2 = possible_values[fvs[1][0]]
+                # if fv1["maximum"] < inf:
+                #     val1 =
+
+        print(possible_values)
 
     def calculate_value(self, equations, free_values, state):
         total = sum(state)
@@ -219,8 +261,8 @@ class Solve:
         calculations = zip(row1, row2)
         return [a - b * factor for a, b in calculations]
 
-    def print_equations(self, equations):
-        if VERBOSE:
+    def print_equations(self, equations, verbose=False):
+        if VERBOSE or verbose:
             print(f"Equations: {[[float(a) for a in equation] for equation in equations]}")
 
 
@@ -242,6 +284,6 @@ start_time = time.time()
 # Solve().solve_a('example.txt')
 # Solve().solve_a('input_2.txt')
 print("\n")
-# Solve().solve_b('example.txt')
-Solve().solve_b('input.txt')
+Solve().solve_b('example.txt')
+# Solve().solve_b('input.txt')
 print("--- %s seconds ---" % (time.time() - start_time))
