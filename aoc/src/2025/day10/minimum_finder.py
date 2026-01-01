@@ -1,6 +1,7 @@
 from math import floor, inf
 from fractions import Fraction
 from itertools import product
+from min_max_finder import MinMaxFinder
 
 class FreeValue:
     def __init__(self, position, minimum=0, maximum=inf, multiple=1, offset=0):
@@ -9,6 +10,9 @@ class FreeValue:
         self.position = position
         self.multiple = multiple
         self.offset = offset
+
+    def print(self):
+        print(f"min: {self.minimum}. max: {self.maximum}. pos: {self.position}. mul: {self.multiple}. off: {self.offset}")
 
 class MinimumFinder:
     def __init__(self, equations=[], free_values=[]):
@@ -25,7 +29,7 @@ class MinimumFinder:
 
     def find_minimum(self):
         minimum = inf
-        for values in product(*self.generate_values()):
+        for values in self.generate_values():
             total = self.calculate_total(values)
             if total < minimum:
                 minimum = total
@@ -33,10 +37,13 @@ class MinimumFinder:
 
     def generate_values(self):
         values = []
+
         for free_value in self.free_values.values():
             v = list(range(free_value.minimum, free_value.maximum + 1, free_value.multiple))
             values.append(v)
-        return values
+        if len(values) == 1:
+            return [[v] for v in values[0]]
+        return list(product(*values))
 
     def calculate_total(self, values):
         paired_values = list(zip(values, self.free_values.values()))
@@ -56,18 +63,26 @@ class MinimumFinder:
         return True
 
     def find_free_values_parameters(self):
-        # first iteration
-        for free_value in self.free_values.values():
-            for equation in self.equations:
-                free_value.maximum = min(free_value.maximum, self.maximum_value(equation, free_value.position))
-        # # second iteration
-        for free_value in self.free_values.values():
-            for equation in self.equations:
-                adjusted_equations = self.adjust_equation(equation, free_value.position)
-                if adjusted_equations:
-                    maximum = max(self.maximum_value(adjusted_equations[0], free_value.position),
-                                  self.maximum_value(adjusted_equations[1], free_value.position))
-                    free_value.maximum = min(free_value.maximum, maximum)
+        min_max_finder = MinMaxFinder(self.equations, self.free_values.values())
+        min_max_finder.call()
+        min_max_finder.calculate_from_2_free_value_equations()
+        # # first iteration
+        # for free_value in self.free_values.values():
+        #     for equation in self.equations:
+        #         minimum, maximum = self.min_max_values(equation, free_value.position)
+        #         free_value.maximum = min(free_value.maximum, maximum)
+        #         free_value.minimum = max(free_value.minimum, minimum)
+        # # # second iteration
+        # for free_value in self.free_values.values():
+        #     for equation in self.equations:
+        #         adjusted_equations = self.adjust_equation(equation, free_value.position)
+        #         if adjusted_equations:
+        #             minimum1, maximum1 = self.min_max_values(adjusted_equations[0], free_value.position)
+        #             minimum2, maximum2 = self.min_max_values(adjusted_equations[1], free_value.position)
+        #             maximum = max(maximum1, maximum2)
+        #             minimum = min(minimum1, minimum2)
+        #             free_value.maximum = min(free_value.maximum, maximum)
+        #             free_value.minimum = min(free_value.minimum, minimum)
 
     def adjust_equation(self, equation, free_value):
         other_free_values_in_equation = [i for i, value in enumerate(equation) if i in self.free_values_values and i != free_value and value != 0]
@@ -99,16 +114,28 @@ class MinimumFinder:
     def is_valid_equation(self, equation, free_value):
         return len([value for i, value in enumerate(equation[:-1]) if value != 0 and i != free_value]) <= 1
 
-    def maximum_value(self, equation, free_value):
-        if not self.is_valid_equation(equation, free_value):
-            return inf
+    def min_max_values(self, equation, free_value):
+        positive_free_values = []
+        negative_free_values = []
         total = equation[-1]
         free_value_factor = equation[free_value]
-        if equation[free_value] == 0:
-            return inf
-        if free_value_factor * total < 0:
-            return inf
-        return int(floor(total / free_value_factor))
+        if free_value_factor == 0:
+            return [inf, inf]
+
+        for fv in self.free_values_values:
+            if equation[fv] > 0:
+                positive_free_values.append(fv)
+            elif equation[fv] < 0:
+                negative_free_values.append(fv)
+
+        if total < 0 and len(positive_free_values) == 0:
+            # min value
+            return [int(floor(total / free_value_factor)), inf]
+        if total > 0 and len(negative_free_values) == 0:
+            # max value
+            return [inf, int(floor(total / free_value_factor))]
+
+        return [inf, inf]
 
     def find_multiple(self, equation, free_value):
         if not self.is_valid_equation(equation, free_value):
